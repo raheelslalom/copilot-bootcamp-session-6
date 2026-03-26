@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { isOverdue, formatDate } from '../utils/dateUtils';
 
 function TodoCard({ todo, onToggle, onEdit, onDelete, isLoading }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -52,16 +53,6 @@ function TodoCard({ todo, onToggle, onEdit, onDelete, isLoading }) {
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return null;
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
   if (isEditing) {
     return (
       <div className="todo-card todo-card-edit">
@@ -107,7 +98,7 @@ function TodoCard({ todo, onToggle, onEdit, onDelete, isLoading }) {
   }
 
   return (
-    <div className={`todo-card ${todo.completed ? 'completed' : ''}`}>
+    <div className={`todo-card ${todo.completed ? 'completed' : ''} ${isOverdue(todo.dueDate, todo.completed) ? 'todo-card--overdue' : ''}`}>
       <input
         type="checkbox"
         checked={todo.completed === 1}
@@ -122,6 +113,9 @@ function TodoCard({ todo, onToggle, onEdit, onDelete, isLoading }) {
         {todo.dueDate && (
           <p className="todo-due-date">
             Due: {formatDate(todo.dueDate)}
+            {isOverdue(todo.dueDate, todo.completed) && (
+              <span className="overdue-label">Overdue</span>
+            )}
           </p>
         )}
       </div>

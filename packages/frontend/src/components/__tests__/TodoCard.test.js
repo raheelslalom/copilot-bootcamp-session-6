@@ -99,4 +99,43 @@ describe('TodoCard Component', () => {
     
     expect(screen.queryByText(/Due:/)).not.toBeInTheDocument();
   });
+
+  describe('overdue indicator', () => {
+    it('should show overdue class and label for incomplete past-due todo', () => {
+      const overdueTodo = { ...mockTodo, dueDate: '2000-01-01', completed: 0 };
+      const { container } = render(<TodoCard todo={overdueTodo} {...mockHandlers} isLoading={false} />);
+
+      const card = container.querySelector('.todo-card');
+      expect(card).toHaveClass('todo-card--overdue');
+      expect(screen.getByText('Overdue')).toBeInTheDocument();
+    });
+
+    it('should NOT show overdue indicator for completed past-due todo', () => {
+      const completedOverdue = { ...mockTodo, dueDate: '2000-01-01', completed: 1 };
+      const { container } = render(<TodoCard todo={completedOverdue} {...mockHandlers} isLoading={false} />);
+
+      const card = container.querySelector('.todo-card');
+      expect(card).not.toHaveClass('todo-card--overdue');
+      expect(screen.queryByText('Overdue')).not.toBeInTheDocument();
+    });
+
+    it('should NOT show overdue indicator for todo with no dueDate', () => {
+      const noDateTodo = { ...mockTodo, dueDate: null, completed: 0 };
+      const { container } = render(<TodoCard todo={noDateTodo} {...mockHandlers} isLoading={false} />);
+
+      const card = container.querySelector('.todo-card');
+      expect(card).not.toHaveClass('todo-card--overdue');
+      expect(screen.queryByText('Overdue')).not.toBeInTheDocument();
+    });
+
+    it('should NOT show overdue indicator for incomplete todo due today', () => {
+      const todayString = new Date().toISOString().split('T')[0];
+      const todayTodo = { ...mockTodo, dueDate: todayString, completed: 0 };
+      const { container } = render(<TodoCard todo={todayTodo} {...mockHandlers} isLoading={false} />);
+
+      const card = container.querySelector('.todo-card');
+      expect(card).not.toHaveClass('todo-card--overdue');
+      expect(screen.queryByText('Overdue')).not.toBeInTheDocument();
+    });
+  });
 });
